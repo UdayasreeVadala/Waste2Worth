@@ -2,7 +2,7 @@
 
 ### Give Waste a Second Life.
 
-Waste2Worth is an AI-powered organic waste recovery platform that connects people and businesses with organic waste to businesses that can reuse it as a valuable raw material.
+Waste2Worth is an AI-powered organic waste recovery platform that connects people and businesses with organic waste to businesses that can reuse it as a valuable raw material. 
 
 The problem is simple: waste exists, and demand exists, but they are often disconnected.
 
