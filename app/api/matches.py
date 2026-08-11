@@ -7,7 +7,7 @@ from app.models.waste import WasteListing
 from app.models.buyer import Buyer
 from app.models.match import Match
 from app.schemas.match import MatchResponse
-from app.services.matching_service import find_best_buyers
+from app.services.ai_service import find_ai_ranked_buyers
 from app.services.auth_service import get_current_user
 
 router = APIRouter()
@@ -31,7 +31,7 @@ def get_matches_for_waste(
 
     buyers = db.query(Buyer).all()
 
-    return find_best_buyers(waste, buyers)
+    return find_ai_ranked_buyers(waste, buyers)
 
 @router.post("/{waste_id}/accept/{buyer_id}")
 def accept_match(
@@ -55,7 +55,7 @@ def accept_match(
     if waste.farmer_id != current_user.id:
         raise HTTPException(status_code=403, detail="You can only accept matches for your own waste")
 
-    matches = find_best_buyers(waste, [buyer])
+    matches = find_ai_ranked_buyers(waste, [buyer])
 
     if not matches:
         raise HTTPException(status_code=400, detail="Buyer cannot handle this waste quantity")
