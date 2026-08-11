@@ -8,6 +8,13 @@ class BuyerCreate(BaseModel):
     longitude: float
     price_per_kg: float
     max_capacity_kg: float
+    accepted_waste_types: str = "organic,vegetable,fruit,food,crop,produce"
+    min_quantity_kg: float = 0
+    current_capacity_kg: float | None = None
+    pickup_available: bool = True
+    service_radius_km: float | None = None
+    availability_status: str = "available"
+    currency: str = "INR"
 
 class BuyerResponse(BuyerCreate):
     id: int

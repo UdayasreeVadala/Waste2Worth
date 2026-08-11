@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, Float, ForeignKey
 
 from app.db.database import Base
 
@@ -14,3 +14,10 @@ class Buyer(Base):
     longitude = Column(Float, nullable=False)
     price_per_kg = Column(Float, nullable=False)
     max_capacity_kg = Column(Float, nullable=False)
+    accepted_waste_types = Column(String, default="organic,vegetable,fruit,food,crop,produce")
+    min_quantity_kg = Column(Float, default=0)
+    current_capacity_kg = Column(Float, nullable=True)
+    pickup_available = Column(Boolean, default=True)
+    service_radius_km = Column(Float, nullable=True)
+    availability_status = Column(String, default="available")
+    currency = Column(String, default="INR")

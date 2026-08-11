@@ -39,18 +39,26 @@ def _buyer_to_ai_input(buyer):
             "longitude": buyer.longitude,
         },
         "accepted_waste": _accepted_waste_types(buyer),
-        "min_quantity_kg": 0,
+        "min_quantity_kg": getattr(buyer, "min_quantity_kg", 0) or 0,
         "max_quantity_kg": buyer.max_capacity_kg,
-        "current_capacity_kg": buyer.max_capacity_kg,
+        "current_capacity_kg": getattr(buyer, "current_capacity_kg", None) or buyer.max_capacity_kg,
         "price_per_kg": buyer.price_per_kg,
-        "currency": "INR",
-        "pickup_available": True,
-        "service_radius_km": None,
-        "availability_status": "available",
+        "currency": getattr(buyer, "currency", "INR") or "INR",
+        "pickup_available": bool(getattr(buyer, "pickup_available", True)),
+        "service_radius_km": getattr(buyer, "service_radius_km", None),
+        "availability_status": getattr(buyer, "availability_status", "available") or "available",
     }
 
 
 def _accepted_waste_types(buyer):
+    explicit_types = getattr(buyer, "accepted_waste_types", None)
+    if explicit_types:
+        return [
+            item.strip().lower()
+            for item in explicit_types.split(",")
+            if item.strip()
+        ]
+
     buyer_type = (buyer.buyer_type or "").lower()
 
     if "biochar" in buyer_type:
@@ -69,4 +77,3 @@ def _match_response_from_ai_buyer(ai_buyer):
         "transport_cost": margin["transport_cost"],
         "farmer_earning": margin["estimated_supplier_earnings"],
     }
-
