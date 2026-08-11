@@ -2,10 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import agent, auth, waste, buyers, matches
-from app.db.database import Base, engine
+from app.db.database import Base, engine, ensure_sqlite_schema
 from app.models import user, waste as waste_model, buyer, match
 
 Base.metadata.create_all(bind=engine)
+ensure_sqlite_schema()
 
 app = FastAPI(title="Waste2Worth Backend")
 

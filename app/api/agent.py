@@ -14,6 +14,15 @@ from waste2worth_agent import Waste2WorthAgent
 router = APIRouter()
 
 
+@router.get("/")
+def agent_info():
+    return {
+        "message": "Agent API is running",
+        "contact_endpoint": "POST /agent/matches/{match_id}/contact",
+        "note": "Open /docs to test this route with request body and authentication.",
+    }
+
+
 @router.post("/matches/{match_id}/contact", response_model=AgentContactResponse)
 def contact_buyer_for_match(
     match_id: int,
@@ -103,4 +112,3 @@ class InMemoryEventGateway:
                 "payload": payload or {},
             }
         )
-

@@ -12,6 +12,17 @@ from app.services.auth_service import get_current_user
 
 router = APIRouter()
 
+
+@router.get("/")
+def matches_info():
+    return {
+        "message": "Matches API is running",
+        "match_endpoint": "GET /matches/{waste_id}",
+        "accept_endpoint": "POST /matches/{waste_id}/accept/{buyer_id}",
+        "note": "Open /docs to test protected routes with authentication.",
+    }
+
+
 @router.get("/{waste_id}", response_model=list[MatchResponse])
 def get_matches_for_waste(
     waste_id: int,
