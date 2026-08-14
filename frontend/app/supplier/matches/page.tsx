@@ -156,7 +156,7 @@ function MatchesInner() {
 
   return (
     <Shell>
-      <h1 className="mb-1 text-2xl font-semibold text-forest-900">Buyer matches</h1>
+      <h1 className="mb-1 font-display text-2xl font-medium text-forest-900">Buyer matches</h1>
       <p className="mb-6 text-sm text-ink-muted">
         Matches matched to your waste, with the AI agent negotiation status.
       </p>

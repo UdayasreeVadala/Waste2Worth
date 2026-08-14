@@ -139,7 +139,7 @@ function AnalysisInner() {
 
   return (
     <Shell>
-      <h1 className="mb-1 text-2xl font-semibold text-forest-900">AI analysis</h1>
+      <h1 className="mb-1 font-display text-2xl font-medium text-forest-900">AI analysis</h1>
       <p className="mb-6 text-sm text-ink-muted">Waste #{wasteId}</p>
       {data.error && (
         <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">

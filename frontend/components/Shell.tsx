@@ -73,12 +73,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-parchment">
-      <aside className="hidden w-60 shrink-0 flex-col border-r border-ink/10 bg-forest-900 text-white md:flex">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-forest-950/40 bg-mission text-white md:flex">
         <Link href="/" className="flex items-center gap-2 px-5 py-5">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-lime-400 text-forest-950">
             <Recycle className="h-5 w-5" />
           </span>
-          <span className="font-semibold tracking-wide">Waste2Worth</span>
+          <span className="flex flex-col leading-tight">
+            <span className="font-display font-medium tracking-wide">Waste2Worth</span>
+            <span className="text-[10px] font-normal text-white/60">Give waste a second life</span>
+          </span>
         </Link>
 
         <nav className="flex-1 space-y-1 px-3 py-2">
@@ -89,16 +92,31 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                  "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-all duration-300 hover:translate-x-0.5",
                   active ? "bg-white/15 text-lime-400" : "text-white/75 hover:bg-white/10 hover:text-white"
                 )}
               >
-                <item.icon className="h-4 w-4" />
+                <span
+                  className={cn(
+                    "absolute left-0 top-1/2 h-4 w-1 -translate-y-1/2 rounded-full bg-lime-400 transition-all duration-300",
+                    active ? "opacity-100" : "opacity-0 group-hover:opacity-40"
+                  )}
+                />
+                <item.icon className={cn("h-4 w-4 transition-transform duration-300", active ? "" : "group-hover:scale-110")} />
                 {item.label}
               </Link>
             );
           })}
         </nav>
+
+        <div className="mx-3 mb-3 rounded-lg border border-lime-400/25 bg-forest-950/40 p-3">
+          <p className="flex items-center gap-1.5 text-[11px] font-medium text-lime-400">
+            <Leaf className="h-3.5 w-3.5" /> Environmental mission
+          </p>
+          <p className="mt-1 text-[11px] leading-5 text-white/70">
+            Every recovered kilo is methane kept out of the air — and value kept in your pocket.
+          </p>
+        </div>
 
         <div className="border-t border-white/15 px-4 py-4">
           <p className="text-sm font-medium">{user.name}</p>
@@ -124,8 +142,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
         <main className="flex-1 p-5 lg:p-8">{children}</main>
 
-        <footer className="border-t border-ink/10 px-5 py-3 text-xs text-ink-muted">
-          <Link href="/" className="inline-flex items-center gap-1 hover:text-forest-900">
+        <footer className="flex flex-col gap-2 border-t border-ink/10 bg-forest-950 px-5 py-4 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            <span className="font-medium text-lime-400">Waste2Worth</span> — preventing usable organic
+            waste from becoming disposal waste.
+          </p>
+          <Link href="/" className="inline-flex items-center gap-1 hover:text-white">
             <ArrowLeft className="h-3 w-3" /> Back to home
           </Link>
         </footer>

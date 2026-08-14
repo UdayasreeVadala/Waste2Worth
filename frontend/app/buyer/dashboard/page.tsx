@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Leaf, Users } from "lucide-react";
 import { Shell } from "@/components/Shell";
+import { ImpactBanner } from "@/components/ImpactBanner";
 import { Button, Card, EmptyState, StatCard, Spinner } from "@/components/ui";
 import { http } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -45,7 +46,7 @@ export default function BuyerDashboard() {
     <Shell>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-forest-900">Dashboard</h1>
+          <h1 className="font-display text-2xl font-medium text-forest-900">Dashboard</h1>
           <p className="mt-1 text-sm text-ink-muted">
             Find waste you can process and track your deals.
           </p>
@@ -56,6 +57,8 @@ export default function BuyerDashboard() {
           </Button>
         </Link>
       </div>
+
+      <ImpactBanner />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Available waste" value={num(avail.length)} />

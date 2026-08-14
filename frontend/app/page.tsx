@@ -1,61 +1,58 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BarChart3,
-  Bot,
+  ArrowUpRight,
   Building2,
   FlaskConical,
   Leaf,
   Recycle,
-  Route,
+  Sprout,
   Sparkles,
-  Target,
-  Users,
 } from "lucide-react";
 import { AuthGate } from "@/components/AuthGate";
 import { cn } from "@/lib/cn";
+import { Cube3D } from "@/components/anim/Cube3D";
+import { ParticleField } from "@/components/anim/ParticleField";
+import { Reveal } from "@/components/anim/Reveal";
+import { TiltCard } from "@/components/anim/TiltCard";
 
-const JOURNEY = [
-  { icon: Recycle, title: "Waste", text: "You list what you have — tomatoes, peels, produce, food." },
-  { icon: Sparkles, title: "AI Analysis", text: "Waste2Worth builds a structured profile of the material." },
-  { icon: Route, title: "Best Use", text: "The AI compares economic routes, not just the nearest buyer." },
-  { icon: Building2, title: "Buyer", text: "Suitable buyers are ranked by net return, distance and capacity." },
-  { icon: Leaf, title: "Resource", text: "An AI agent closes the deal. The waste becomes a feedstock." },
-];
-
-const STEPS = [
+const PATH = [
   {
-    step: "01",
-    title: "List your waste",
-    text: "Type, quantity, condition, location. No technical classifications needed.",
+    title: "You describe the waste in your own words",
+    text: '"Around 2 tonnes of spoiled onions from Nashik." A photo works too. No technical classification needed.',
   },
   {
-    step: "02",
-    title: "AI finds the best destination",
-    text: "The engine compares routes like composting, anaerobic digestion and vermicomposting against live buyer demand.",
+    title: "AI builds a structured profile",
+    text: "Type, quantity, condition, moisture, location. Every claim is labelled - AI inference or rule - never silently mixed.",
   },
   {
-    step: "03",
-    title: "Compare real returns",
-    text: "See buyer offers, estimated transport, platform fee and your estimated net earnings side by side.",
+    title: "The best reuse is chosen, not guessed",
+    text: "Anaerobic digestion, composting, vermicompost or biochar - compared against real buyer demand, capacity and distance.",
   },
   {
-    step: "04",
-    title: "Approve the AI agent",
-    text: "After your permission, the agent contacts the buyer, negotiates within your limits and reports back.",
+    title: "Buyers are ranked by your net return",
+    text: "Earnings minus transport and fee, distance, pickup, capacity. Each score carries an auditable factor breakdown.",
   },
   {
-    step: "05",
-    title: "Track the deal to completion",
-    text: "Pickup, collection and completion are tracked in a transparent transaction timeline.",
+    title: "A human-approved agent closes the deal",
+    text: "You approve contact. The agent writes the outreach, negotiates within your floor - never below it - and reports the transcript.",
   },
 ];
 
-const METRICS = [
-  { icon: Leaf, value: "Tonnage", label: "organic waste diverted from disposal", accent: "lime" },
-  { icon: Users, value: "2 actor types", label: "suppliers with waste, buyers with capacity", accent: "moss" },
-  { icon: Bot, value: "AI-first", label: "recommendation, ranking and agent negotiation", accent: "lime" },
-  { icon: BarChart3, value: "Net returns", label: "estimated before any deal is closed", accent: "moss" },
+const ROUTES = ["Anaerobic digestion", "Composting", "Vermicomposting", "Biochar"];
+
+const SUPPLIERS = [
+  "Vegetable wholesale markets",
+  "Farms and orchards",
+  "Restaurants and hotels",
+  "Supermarkets and food processors",
+];
+
+const BUYERS = [
+  "Biogas and AD plants",
+  "Composting companies",
+  "Vermicompost producers",
+  "Organic processors",
 ];
 
 export default function Home() {
@@ -63,105 +60,127 @@ export default function Home() {
     <main className="min-h-screen bg-parchment text-ink">
       <AuthGate />
       <Hero />
-      <Problem />
-      <Journey />
-      <HowItWorks />
-      <UseCases />
-      <Metrics />
+      <Gap />
+      <Path />
+      <WhereItGoes />
+      <Impact />
+      <Quote />
       <CTA />
+      <SiteFooter />
     </main>
   );
 }
 
 function Hero() {
   return (
-    <section className="bg-forest-950 text-white">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
-        <span className="flex items-center gap-2 font-semibold tracking-wide">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-lime-400 text-forest-950">
-            <Recycle className="h-5 w-5" />
+    <section className="relative overflow-hidden bg-forest-950 text-white">
+      <ParticleField className="absolute inset-0 h-full w-full opacity-70" />
+      <div className="relative">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6">
+          <span className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-lime-400 text-forest-950">
+              <Recycle className="h-5 w-5" />
+            </span>
+            <span className="font-display text-lg font-medium tracking-tight">Waste2Worth</span>
           </span>
-          Waste2Worth
-        </span>
-        <div className="flex items-center gap-4 text-sm">
-          <Link href="/login" className="hidden text-white/75 hover:text-white sm:block">
-            Sign in
-          </Link>
-          <Link
-            href="/register"
-            className="rounded-md bg-lime-400 px-4 py-2 text-sm font-medium text-forest-950 hover:bg-lime-300"
-          >
-            Create account
-          </Link>
-        </div>
-      </nav>
-
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 pb-16 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:pb-24 lg:pt-20">
-        <div>
-          <p className="mb-4 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.22em] text-lime-400">
-            <Sparkles className="h-4 w-4" />
-            AI-powered organic waste recovery
-          </p>
-          <h1 className="text-5xl font-semibold leading-[1.05] tracking-tight md:text-7xl">
-            Give waste a second life.
-          </h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-white/80">
-            Waste2Worth uses AI to find the most valuable destination for organic waste and connects
-            waste owners with the businesses that can turn it into biogas, compost and other
-            resources.
-          </p>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/register?role=supplier"
-              className="group flex items-center justify-center gap-2 rounded-md bg-lime-400 px-6 py-3 text-sm font-semibold text-forest-950 transition-colors hover:bg-lime-300"
-            >
-              I have waste
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          <div className="flex items-center gap-6 text-sm">
+            <Link href="/login" className="hidden text-white/70 transition-colors hover:text-white sm:block">
+              Sign in
             </Link>
             <Link
-              href="/register?role=buyer"
-              className="group flex items-center justify-center gap-2 rounded-md border border-white/25 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              href="/register"
+              className="btn-3d rounded-md bg-lime-400 px-4 py-2 text-sm font-medium text-forest-950 transition-colors hover:bg-lime-300"
             >
-              I need waste
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              Create account
             </Link>
           </div>
-        </div>
+        </nav>
 
-        <div className="relative">
-          <div className="rounded-2xl border border-white/15 bg-forest-900/60 p-6 shadow-2xl backdrop-blur">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm font-medium text-white/80">Live recommendation</p>
-              <span className="rounded-full bg-lime-400/20 px-2.5 py-0.5 text-xs font-medium text-lime-400">
-                AI ranked
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              <Row label="Waste" value="700 kg tomato waste" />
-              <Row label="Condition" value="Spoiled" />
-              <Row label="Best route" value="Anaerobic digestion" />
-              <Row label="Top buyer" value="GreenBio Energy — 1.4 km" />
-              <Row label="Estimated net" value="INR 20,370" />
-              <Row label="Agent" value="Negotiating within limits" />
-            </div>
-
-            <div className="mt-5 rounded-lg border border-white/15 bg-forest-950/60 p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-lime-400">Why this buyer</p>
-              <p className="mt-2 text-sm leading-6 text-white/85">
-                Accepts tomato waste, has open capacity, arranges pickup, and offers the highest
-                estimated net return after transport.
+        <div className="mx-auto grid max-w-6xl gap-12 px-5 pb-14 pt-14 lg:grid-cols-[1.15fr_0.85fr] lg:pb-20 lg:pt-20">
+          <div>
+            <Reveal>
+              <p className="eyebrow flex items-center gap-2 text-lime-400">
+                <span className="h-px w-8 bg-lime-400/60" /> AI waste recovery - India
               </p>
-            </div>
+            </Reveal>
+            <Reveal delay={70}>
+              <h1 className="font-display mt-5 text-5xl font-medium leading-[1.02] tracking-tight md:text-7xl">
+                Give waste a <em className="font-normal italic text-lime-400">second life.</em>
+              </h1>
+            </Reveal>
+            <Reveal delay={140}>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-white/75">
+                Waste2Worth prevents usable organic waste from becoming disposal waste. AI determines
+                its highest-value reuse pathway - then autonomously connects it with a suitable buyer.
+              </p>
+            </Reveal>
+            <Reveal delay={210}>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/register?role=supplier"
+                  className="btn-3d group flex items-center justify-center gap-2 rounded-md bg-lime-400 px-6 py-3 text-sm font-semibold text-forest-950 transition-colors hover:bg-lime-300"
+                >
+                  I have waste
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+                <Link
+                  href="/register?role=buyer"
+                  className="group flex items-center justify-center gap-2 rounded-md border border-white/25 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                >
+                  I need waste
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </Reveal>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-            {[["Route", "Biogas"], ["Distance", "1.4 km"], ["Pickup", "Included"]].map(([key, value]) => (
-              <div key={key} className="rounded-xl border border-white/15 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-wider text-white/55">{key}</p>
-                <p className="mt-1 text-sm font-semibold">{value}</p>
+          <Reveal delay={180} className="relative">
+            <div className="anim-float absolute -right-4 -top-8 z-10 hidden md:block">
+              <Cube3D size={88} />
+            </div>
+            <TiltCard intensity={8}>
+              <div className="glass-card rounded-2xl border border-white/15 bg-forest-900/60 p-6 backdrop-blur">
+                <div className="mb-5 flex items-center justify-between">
+                  <p className="eyebrow text-lime-400">Live recommendation</p>
+                  <span className="anim-pulse-ring rounded-full bg-lime-400/20 px-2.5 py-0.5 text-xs font-medium text-lime-400">
+                    AI ranked
+                  </span>
+                </div>
+
+                <div className="divide-y divide-white/10">
+                  <Row label="Waste" value="700 kg tomato" />
+                  <Row label="Condition" value="Spoiled" />
+                  <Row label="Best route" value="Anaerobic digestion" />
+                  <Row label="Top buyer" value="GreenBio Energy - 1.4 km" />
+                  <Row label="Estimated net" value="INR 20,370" />
+                  <Row label="Agent" value="Negotiating within limits" />
+                </div>
+
+                <div className="mt-5 rounded-lg border border-white/12 bg-forest-950/60 p-4">
+                  <p className="eyebrow text-lime-400">Why this buyer</p>
+                  <p className="mt-2 text-sm leading-6 text-white/85">
+                    Accepts tomato waste, has open capacity, arranges pickup, and offers the highest
+                    estimated net return after transport.
+                  </p>
+                </div>
               </div>
+            </TiltCard>
+          </Reveal>
+        </div>
+
+        <div className="hairline-wt">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-y-1 px-5 py-8 sm:grid-cols-3">
+            {[
+              { value: "0.10 kg", label: "methane per kg of food waste - if landfilled" },
+              { value: "28x", label: "stronger than CO2 (81x over 20 years)" },
+              { value: "2,800 kg", label: "CO2e avoided for every tonne diverted" },
+            ].map((s, i) => (
+              <Reveal key={s.label} delay={i * 100}>
+                <div className="flex items-baseline gap-3 sm:flex-col sm:gap-1">
+                  <span className="font-display tabular text-3xl font-medium text-lime-400">{s.value}</span>
+                  <span className="text-sm leading-5 text-white/60">{s.label}</span>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -172,67 +191,127 @@ function Hero() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-white/10 bg-forest-950/50 px-4 py-3 text-sm">
-      <span className="text-white/60">{label}</span>
+    <div className="flex items-center justify-between py-3 text-sm">
+      <span className="text-white/55">{label}</span>
       <span className="font-medium text-white">{value}</span>
     </div>
   );
 }
 
-function Problem() {
+function SectionHeading({
+  index,
+  eyebrow,
+  title,
+  aside,
+}: {
+  index: string;
+  eyebrow: string;
+  title: React.ReactNode;
+  aside?: React.ReactNode;
+}) {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-20 lg:py-24">
-      <div className="grid gap-10 lg:grid-cols-2">
-        <div>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-forest-800">The problem</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-            Organic waste is a mispriced asset.
-          </h2>
-          <p className="mt-5 max-w-lg leading-8 text-ink-muted">
-            Markets, farms, restaurants and supermarkets discard tonnes of perfectly reusable material.
-            A simple marketplace finds A buyer. Waste2Worth finds the <em>right</em> destination — the
-            route and buyer that give the waste its best practical and economic value.
-          </p>
-        </div>
-        <div>
-          <p className="text-sm font-medium uppercase tracking-[0.2em] text-forest-800">The solution</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-            Waste → AI analysis → best use → buyer → resource.
-          </h2>
-          <p className="mt-5 max-w-lg leading-8 text-ink-muted">
-            The platform analyzes the material, compares processing routes and buyer demand, estimates
-            your real net return, and then uses an AI agent — only after your approval — to contact,
-            negotiate and track the deal until the waste is collected.
-          </p>
-        </div>
+    <div className="hairline-b mb-12 flex flex-col justify-between gap-6 pb-6 lg:flex-row lg:items-end">
+      <div className="max-w-2xl">
+        <p className="eyebrow text-forest-700">
+          <span className="text-ink-muted">{index}</span> - {eyebrow}
+        </p>
+        <h2 className="font-display mt-3 text-4xl font-medium tracking-tight text-ink md:text-5xl">
+          {title}
+        </h2>
+      </div>
+      {aside && <div className="max-w-sm text-sm leading-6 text-ink-muted lg:text-right">{aside}</div>}
+    </div>
+  );
+}
+
+function Gap() {
+  return (
+    <section className="mx-auto max-w-6xl px-5 py-24">
+      <SectionHeading
+        index="01"
+        eyebrow="The gap"
+        title={
+          <>
+            Organic waste is a <em className="font-normal italic">mispriced asset</em> - dumped instead of recovered.
+          </>
+        }
+        aside="A marketplace finds A buyer. Waste2Worth finds the right destination - the route and buyer that give waste its best practical and economic value."
+      />
+
+      <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr]">
+        <Reveal>
+          <div className="space-y-5 text-lg leading-9 text-ink-muted">
+            <p>
+              Markets, farms and restaurants discard tonnes of reusable material every week. In an
+              open dump, that material <strong className="font-semibold text-ink">ferments into methane</strong> - a
+              greenhouse gas roughly <strong className="font-semibold text-ink">28x stronger than CO2</strong>.
+            </p>
+            <p>
+              The waste is not the problem. The destination is. When organic waste reaches a biogas
+              plant or a composter, it becomes a feedstock. When it reaches a dump, it becomes a
+              liability - for the planet and for whoever paid to haul it.
+            </p>
+          </div>
+        </Reveal>
+        <Reveal delay={120}>
+          <div className="rounded-xl border border-ink/10 bg-white p-6 shadow-soft">
+            <p className="eyebrow text-forest-700">One tonne of spoiled onions</p>
+            <div className="mt-4 space-y-3">
+              <Outcome label="Dumped at a landfill" value="~280 kg CO2e released" bad />
+              <Outcome label="Recovered via biogas" value="~280 kg CO2e avoided" good />
+              <Outcome label="Supplier" value="earns for the material" good />
+              <Outcome label="Buyer" value="gets reliable feedstock" good />
+            </div>
+            <p className="mt-4 text-xs leading-5 text-ink-muted">
+              Methane yield 0.10 kg CH4/kg, GWP 28 (IPCC AR5). Methodology in the product docs.
+            </p>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
 }
 
-function Journey() {
+function Outcome({ label, value, bad, good }: { label: string; value: string; bad?: boolean; good?: boolean }) {
   return (
-    <section className="bg-forest-950 py-20 text-white">
+    <div className="flex items-center justify-between gap-3 border-b border-ink/5 pb-3 text-sm">
+      <span className="text-ink-muted">{label}</span>
+      <span className={cn("text-right font-medium", bad ? "text-red-700" : good ? "text-forest-700" : "text-ink")}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function Path() {
+  return (
+    <section className="bg-moss-50 py-24">
       <div className="mx-auto max-w-6xl px-5">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-lime-400">The journey</p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-          One path from surplus to feedstock.
-        </h2>
-        <div className="mt-10 grid gap-4 md:grid-cols-5">
-          {JOURNEY.map((item, index) => (
-            <div
-              key={item.title}
-              className="relative rounded-xl border border-white/12 bg-forest-900/70 p-5"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-lime-400 text-forest-950">
-                <item.icon className="h-5 w-5" />
+        <SectionHeading
+          index="02"
+          eyebrow="The path"
+          title={
+            <>
+              From surplus to feedstock - <em className="font-normal italic">with a paper trail</em>.
+            </>
+          }
+          aside="Five steps, one goal: keep the waste out of the dump and the value with you."
+        />
+
+        <div>
+          {PATH.map((step, i) => (
+            <Reveal key={step.title} delay={i * 60}>
+              <div className="group grid gap-3 border-b border-ink/10 py-7 transition-colors hover:bg-moss-100/60 lg:grid-cols-[3rem_1fr_auto] lg:items-start lg:gap-8">
+                <span className="font-display tabular text-2xl font-medium text-moss-200 transition-colors duration-300 group-hover:text-lime-400">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="font-display text-xl font-medium text-ink">{step.title}</h3>
+                  <p className="mt-1.5 max-w-2xl leading-7 text-ink-muted">{step.text}</p>
+                </div>
+                <Sparkles className="hidden h-5 w-5 text-forest-700/40 transition-colors duration-300 group-hover:text-lime-400 lg:mt-1 lg:block" />
               </div>
-              <p className="mt-4 text-sm font-semibold uppercase tracking-wider text-lime-400">
-                {String(index + 1).padStart(2, "0")}
-              </p>
-              <h3 className="mt-1 font-semibold">{item.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-white/70">{item.text}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -240,93 +319,124 @@ function Journey() {
   );
 }
 
-function HowItWorks() {
+function WhereItGoes() {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-20 lg:py-24">
-      <p className="text-sm font-medium uppercase tracking-[0.2em] text-forest-800">How it works</p>
-      <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-        From listing to a completed transaction.
-      </h2>
-      <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        {STEPS.map((step) => (
-          <div key={step.step} className="rounded-xl border border-ink/10 bg-white p-5">
-            <p className="text-3xl font-semibold text-moss-200">{step.step}</p>
-            <h3 className="mt-3 font-semibold text-ink">{step.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-ink-muted">{step.text}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
+    <section className="mx-auto max-w-6xl px-5 py-24">
+      <SectionHeading
+        index="03"
+        eyebrow="Where it goes"
+        title={
+          <>
+            Two sides of one <em className="font-normal italic">purposeful</em> marketplace.
+          </>
+        }
+        aside="Waste2Worth is a marketplace - but every deal is also an environmental decision. That is by design, not by accident."
+      />
 
-function UseCases() {
-  const suppliers = [
-    "Farmers and wholesale markets",
-    "Restaurants and hotels",
-    "Supermarkets and food processors",
-    "Cafeterias and institutions",
-  ];
-  const buyers = [
-    "Composting companies",
-    "Biogas and anaerobic digestion plants",
-    "Vermicompost producers",
-    "Biochar and organic processors",
-  ];
-  return (
-    <section className="bg-moss-50 py-20">
-      <div className="mx-auto max-w-6xl px-5">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-forest-800">Who it connects</p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-          Two sides of one marketplace.
-        </h2>
-        <div className="mt-10 grid gap-4 lg:grid-cols-2">
-          {[
-            {
-              icon: Target,
-              title: "I have waste",
-              items: suppliers,
-              accent: true,
-              cta: { label: "List your waste", href: "/register?role=supplier" },
-            },
-            {
-              icon: Leaf,
-              title: "I need waste",
-              items: buyers,
-              accent: false,
-              cta: { label: "Register as a buyer", href: "/register?role=buyer" },
-            },
-          ].map((card) => (
-            <div
-              key={card.title}
-              className={cn(
-                "rounded-xl border p-8",
-                card.accent ? "border-forest-900 bg-forest-900 text-white" : "border-ink/10 bg-white"
-              )}
+      <div className="grid gap-8 lg:grid-cols-2">
+        <Reveal>
+          <div className="relative flex h-full flex-col overflow-hidden rounded-2xl bg-forest-900 p-8 text-white shadow-lift">
+            <div className="flex items-center justify-between">
+              <p className="eyebrow text-lime-400">I have waste</p>
+              <Sprout className="h-5 w-5 text-lime-400/70" />
+            </div>
+            <p className="font-display mt-3 text-2xl font-medium">You are sitting on a resource.</p>
+            <p className="mt-2 text-sm leading-6 text-white/65">
+              List it in your own words. AI structures it, ranks buyers by your net return, and an
+              approved agent negotiates. You approve every step.
+            </p>
+            <ul className="mt-6 flex-1 space-y-2.5">
+              {SUPPLIERS.map((s) => (
+                <li key={s} className="flex items-center gap-2.5 text-sm text-white/80">
+                  <span className="h-1.5 w-1.5 rounded-full bg-lime-400" /> {s}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/register?role=supplier"
+              className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold text-lime-400 hover:text-lime-300"
             >
-              <card.icon className={cn("h-7 w-7", card.accent ? "text-lime-400" : "text-forest-800")} />
-              <h3 className="mt-4 text-xl font-semibold">{card.title}</h3>
-              <ul className="mt-5 space-y-2.5">
-                {card.items.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm">
-                    <span className={cn("mt-1.5 h-1.5 w-1.5 rounded-full", card.accent ? "bg-lime-400" : "bg-forest-800")} />
-                    <span className={cn(card.accent ? "text-white/85" : "text-ink-muted")}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href={card.cta.href}
-                className={cn(
-                  "group mt-7 inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-colors",
-                  card.accent
-                    ? "bg-lime-400 text-forest-950 hover:bg-lime-300"
-                    : "bg-forest-900 text-white hover:bg-forest-700"
-                )}
-              >
-                {card.cta.label}
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+              List your waste <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        </Reveal>
+
+        <Reveal delay={120}>
+          <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-ink/10 bg-white p-8 shadow-soft">
+            <div className="flex items-center justify-between">
+              <p className="eyebrow text-forest-700">I need waste</p>
+              <Building2 className="h-5 w-5 text-forest-700/50" />
             </div>
+            <p className="font-display mt-3 text-2xl font-medium text-ink">Reliable feedstock, matched to your process.</p>
+            <p className="mt-2 text-sm leading-6 text-ink-muted">
+              Set your requirements - type, volume, pickup. AI scores suppliers by demand, distance
+              and capacity, so your plant runs full.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {ROUTES.map((r) => (
+                <span
+                  key={r}
+                  className="rounded-full border border-forest-900/15 bg-moss-50 px-3 py-1 text-xs font-medium text-forest-800 transition-colors hover:bg-moss-100"
+                >
+                  {r}
+                </span>
+              ))}
+            </div>
+            <ul className="mt-6 flex-1 space-y-2.5">
+              {BUYERS.map((b) => (
+                <li key={b} className="flex items-center gap-2.5 text-sm text-ink-muted">
+                  <span className="h-1.5 w-1.5 rounded-full bg-forest-800" /> {b}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/register?role=buyer"
+              className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold text-forest-900 hover:text-forest-700"
+            >
+              Register as a buyer <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function Impact() {
+  const stats = [
+    { value: "0.10", unit: "kg", label: "methane per kg of wet food waste in an uncaptured dump" },
+    { value: "28x", unit: "", label: "100-year warming power of methane vs CO2 (IPCC AR5)" },
+    { value: "2,800", unit: "kg", label: "CO2e avoided per tonne recovered - about 14,000 car-kilometres" },
+  ];
+  return (
+    <section className="bg-forest-950 py-24 text-white">
+      <div className="mx-auto max-w-6xl px-5">
+        <div className="hairline-wt mb-12 flex flex-col justify-between gap-6 pb-6 lg:flex-row lg:items-end">
+          <div className="max-w-2xl">
+            <p className="eyebrow text-lime-400">
+              <span className="text-white/50">04</span> - The accounting
+            </p>
+            <h2 className="font-display mt-3 text-4xl font-medium tracking-tight md:text-5xl">
+              Every listing carries a <em className="font-normal italic text-lime-400">measurable</em> environmental number.
+            </h2>
+          </div>
+          <p className="max-w-sm text-sm leading-6 text-white/55 lg:text-right">
+            Not a green badge - a figure. Computed per listing, aggregated per platform, and traceable
+            to a published methodology.
+          </p>
+        </div>
+
+        <div className="grid gap-8 sm:grid-cols-3">
+          {stats.map((s, i) => (
+            <Reveal key={s.label} delay={i * 100}>
+              <div className="hairline-wt pt-6">
+                <p className="font-display tabular text-5xl font-medium text-lime-400">
+                  {s.value}
+                  {s.unit && <span className="text-2xl text-white/50"> {s.unit}</span>}
+                </p>
+                <p className="mt-3 max-w-xs text-sm leading-6 text-white/60">{s.label}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -334,46 +444,90 @@ function UseCases() {
   );
 }
 
-function Metrics() {
+function Quote() {
   return (
-    <section className="border-y border-ink/10 bg-white">
-      <div className="mx-auto grid max-w-6xl gap-px px-5 py-16 sm:grid-cols-2 lg:grid-cols-4">
-        {METRICS.map((metric) => (
-          <div key={metric.label} className="px-2">
-            <metric.icon
-              className={cn("h-6 w-6", metric.accent === "lime" ? "text-lime-400" : "text-forest-800")}
-            />
-            <p className="mt-4 text-2xl font-semibold">{metric.value}</p>
-            <p className="mt-1 text-sm text-ink-muted">{metric.label}</p>
-          </div>
-        ))}
-      </div>
+    <section className="mx-auto max-w-4xl px-5 py-28 text-center">
+      <Reveal>
+        <FlaskConical className="mx-auto h-7 w-7 text-lime-400" />
+        <blockquote className="font-display mt-8 text-3xl font-medium leading-snug tracking-tight text-ink md:text-4xl">
+          &ldquo;I used to <em className="font-normal italic">pay</em> to get rid of spoiled produce. Now the
+          agent finds a buyer and negotiates a price.&rdquo;
+        </blockquote>
+        <p className="eyebrow mt-8 text-forest-700">Market stall holder - Nashik</p>
+      </Reveal>
     </section>
   );
 }
 
 function CTA() {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-20 text-center">
-      <FlaskConical className="mx-auto h-8 w-8 text-forest-800" />
-      <h2 className="mx-auto mt-4 max-w-2xl text-3xl font-semibold tracking-tight md:text-4xl">
-        The platform does not simply find someone who wants the waste.
-      </h2>
-      <p className="mx-auto mt-5 max-w-2xl leading-8 text-ink-muted">
-        It determines where that waste has the best practical and economic destination — then sends an
-        AI agent to close the deal for you.
-      </p>
-      <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-        <Link
-          href="/register?role=supplier"
-          className="rounded-md bg-forest-900 px-6 py-3 text-sm font-semibold text-white hover:bg-forest-700"
-        >
-          Start with your waste
-        </Link>
-        <Link href="/register" className="rounded-md border border-ink/20 px-6 py-3 text-sm font-semibold hover:bg-moss-100">
-          Create an account
-        </Link>
+    <section className="bg-forest-900">
+      <div className="mx-auto flex max-w-6xl flex-col items-center px-5 py-24 text-center text-white">
+        <Reveal>
+          <p className="eyebrow text-lime-400">Start with your waste</p>
+          <h2 className="font-display mt-4 max-w-2xl text-4xl font-medium tracking-tight md:text-5xl">
+            Turn what you throw away into <em className="font-normal italic text-lime-400">what you earn.</em>
+          </h2>
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/register?role=supplier"
+              className="btn-3d rounded-md bg-lime-400 px-7 py-3 text-sm font-semibold text-forest-950 transition-colors hover:bg-lime-300"
+            >
+              List your first waste
+            </Link>
+            <Link href="/register" className="btn-3d rounded-md border border-white/25 px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+              Create an account
+            </Link>
+          </div>
+        </Reveal>
       </div>
     </section>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="bg-forest-950 text-white">
+      <div className="mx-auto max-w-6xl px-5 py-14">
+        <div className="flex flex-col items-start justify-between gap-10 md:flex-row">
+          <div className="max-w-sm">
+            <span className="flex items-center gap-2.5 font-display text-lg font-medium tracking-tight">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-lime-400 text-forest-950">
+                <Recycle className="h-5 w-5" />
+              </span>
+              Waste2Worth
+            </span>
+            <p className="mt-4 text-sm leading-6 text-white/60">
+              Preventing usable organic waste from becoming disposal waste. AI finds the highest-value
+              reuse pathway; an approved agent connects it with a suitable buyer.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-10 text-sm">
+            <div>
+              <p className="eyebrow text-lime-400">Get started</p>
+              <div className="mt-4 space-y-2.5 text-white/70">
+                <p><Link href="/register?role=supplier" className="transition-colors hover:text-white">I have waste</Link></p>
+                <p><Link href="/register?role=buyer" className="transition-colors hover:text-white">I need waste</Link></p>
+                <p><Link href="/login" className="transition-colors hover:text-white">Sign in</Link></p>
+              </div>
+            </div>
+            <div>
+              <p className="eyebrow text-lime-400">Why it matters</p>
+              <div className="mt-4 space-y-2.5 text-white/70">
+                <p>Methane is ~28x stronger than CO2</p>
+                <p>Recovery beats landfill</p>
+                <p>Suppliers earn from surplus</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="hairline-wt mt-12 flex flex-col gap-2 pt-5 text-xs text-white/45 sm:flex-row sm:justify-between">
+          <p>Waste2Worth - give waste a second life.</p>
+          <p className="flex items-center gap-1.5">
+            <Leaf className="h-3 w-3 text-lime-400/70" /> Made for the AI 4 Earth hackathon.
+          </p>
+        </div>
+      </div>
+    </footer>
   );
 }

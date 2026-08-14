@@ -1,8 +1,9 @@
 # Waste2Worth — Give Waste a Second Life
 
-**Waste2Worth** is an AI-powered organic waste recovery platform that connects
-suppliers with organic waste to the buyers who can reuse that material as a raw
-input — biogas plants, composters, vermicompost and biochar producers.
+**Waste2Worth** prevents usable organic waste from becoming disposal waste by
+using AI to determine its highest-value reuse pathway and autonomously connect
+it with a suitable buyer — a biogas plant, composter, vermicompost or biochar
+producer.
 
 It does far more than list waste. It **analyzes the waste** (from text or a
 photo), **recommends the best processing route**, **ranks buyers by true net

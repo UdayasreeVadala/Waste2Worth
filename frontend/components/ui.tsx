@@ -14,9 +14,9 @@ export function Button({
   loading?: boolean;
 }) {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60";
+    "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60";
   const variants = {
-    primary: "bg-forest-900 text-white hover:bg-forest-700",
+    primary: "bg-forest-900 text-white hover:bg-forest-700 shadow-sm",
     secondary: "bg-moss-100 text-forest-900 hover:bg-moss-200",
     outline: "border border-forest-900/20 bg-white text-forest-900 hover:bg-moss-50",
     ghost: "text-forest-900 hover:bg-moss-100",
@@ -44,7 +44,7 @@ export function Card({
   action?: React.ReactNode;
 }) {
   return (
-    <section className={cn("rounded-xl border border-ink/10 bg-white p-5 shadow-sm", className)}>
+    <section className={cn("rounded-xl border border-ink/10 bg-white p-5 shadow-soft transition-all duration-300 hover:shadow-lift", className)}>
       {(title || action) && (
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
@@ -73,7 +73,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-xl border border-ink/10 p-5",
+        "rounded-xl border border-ink/10 p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift",
         tone === "accent" && "border-forest-900/20 bg-forest-900 text-white",
         tone === "success" && "border-lime-400/40 bg-moss-100",
         tone === "default" && "bg-white"

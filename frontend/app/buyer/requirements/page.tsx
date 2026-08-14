@@ -97,7 +97,7 @@ export default function BuyerRequirements() {
     <Shell>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-forest-900">Buyer requirements</h1>
+          <h1 className="font-display text-2xl font-medium text-forest-900">Buyer requirements</h1>
           <p className="mt-1 text-sm text-ink-muted">
             Define what waste you accept and how much you can process. This powers your AI
             recommendations.

@@ -5,15 +5,46 @@
   --color-forest-900: #12362a;
   --color-forest-800: #17432f;
   --color-forest-700: #1d523a;
+  --color-forest-600: #256b4a;
+  --color-forest-500: #2e8158;
   --color-moss-50: #f6fae9;
   --color-moss-100: #eef5df;
   --color-moss-200: #dfecc4;
   --color-lime-400: #b6d87a;
+  --color-lime-300: #cde6a1;
   --color-parchment: #f4f1e8;
   --color-ink: #17211b;
   --color-ink-muted: #68766e;
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --shadow-soft: 0 1px 2px rgb(10 31 23 / 0.06), 0 12px 32px -16px rgb(10 31 23 / 0.35);
+  --shadow-lift: 0 2px 6px rgb(10 31 23 / 0.08), 0 24px 48px -24px rgb(10 31 23 / 0.45);
 }
+
+.font-display {
+  font-family: var(--w2w-display), ui-serif, Georgia, serif;
+  font-feature-settings: "ss01", "ss02";
+}
+
+.font-body {
+  font-family: var(--w2w-body), var(--font-sans);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.eyebrow {
+  font-family: var(--w2w-body), var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hairline-t { border-top: 1px solid rgb(23 33 27 / 0.1); }
+.hairline-b { border-bottom: 1px solid rgb(23 33 27 / 0.1); }
+.hairline-wt { border-top: 1px solid rgb(255 255 255 / 0.14); }
 
 html {
   scroll-behavior: smooth;
@@ -22,10 +53,158 @@ html {
 body {
   background: var(--color-parchment);
   color: var(--color-ink);
-  font-family: var(--font-sans);
+  font-family: var(--w2w-body), var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
   background: var(--color-lime-400);
   color: var(--color-forest-950);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-forest-800) 35%, transparent);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-forest-800) 55%, transparent);
+}
+
+@utility bg-mission {
+  background:
+    radial-gradient(120% 120% at 15% 0%, rgb(46 129 88 / 0.55) 0%, transparent 45%),
+    radial-gradient(120% 120% at 100% 100%, rgb(182 216 122 / 0.25) 0%, transparent 50%),
+    linear-gradient(160deg, var(--color-forest-950) 0%, var(--color-forest-900) 55%, var(--color-forest-700) 100%);
+}
+
+@utility text-mission {
+  background: linear-gradient(90deg, var(--color-lime-400), #eef5df);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility glass {
+  background: color-mix(in srgb, var(--color-forest-900) 55%, transparent);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgb(255 255 255 / 0.12);
+}
+
+/* ---------- Motion ---------- */
+@keyframes drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(18px, -24px) rotate(8deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+@keyframes orbit {
+  0% { transform: rotate(0deg) translateX(220px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(220px) rotate(-360deg); }
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgb(182 216 122 / 0.45); }
+  70% { box-shadow: 0 0 0 14px rgb(182 216 122 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(182 216 122 / 0); }
+}
+@keyframes gradient-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cube-spin {
+  0% { transform: rotateX(-18deg) rotateY(0deg); }
+  100% { transform: rotateX(-18deg) rotateY(360deg); }
+}
+
+.anim-drift { animation: drift 14s ease-in-out infinite; }
+.anim-float { animation: float-y 6s ease-in-out infinite; }
+.anim-spin-slow { animation: spin-slow 24s linear infinite; }
+.anim-pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+.anim-reveal-up { animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-gradient {
+  background-size: 200% 200%;
+  animation: gradient-pan 12s ease infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-drift,
+  .anim-float,
+  .anim-spin-slow,
+  .anim-pulse-ring,
+  .anim-gradient,
+  .anim-reveal-up {
+    animation: none;
+  }
+}
+
+/* 3D helpers */
+.perspective-1200 { perspective: 1200px; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; }
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+  will-change: transform;
+}
+.tilt-card.is-tilting { box-shadow: 0 40px 80px -32px rgb(10 31 23 / 0.5); }
+
+/* Interactive transitions — make every tap/hover feel alive */
+@layer base {
+  a,
+  button {
+    transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  a:active,
+  button:active { transform: translateY(1px) scale(0.99); }
+}
+
+.btn-3d {
+  position: relative;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.25) inset, 0 6px 16px -6px rgb(10 31 23 / 0.5);
+}
+.btn-3d:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgb(255 255 255 / 0.25) inset, 0 14px 28px -10px rgb(10 31 23 / 0.55); }
+
+.glass-card {
+  position: relative;
+  overflow: hidden;
+}
+.glass-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(105deg, transparent 40%, rgb(255 255 255 / 0.14) 50%, transparent 60%);
+  animation: shimmer 3.4s ease-in-out infinite;
+}
+
+/* Animated background orbs */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  pointer-events: none;
+  animation: drift 18s ease-in-out infinite;
 }

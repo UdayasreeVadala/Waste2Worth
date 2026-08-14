@@ -53,7 +53,7 @@ function TransactionsInner() {
 
   return (
     <Shell>
-      <h1 className="mb-1 text-2xl font-semibold text-forest-900">Transactions</h1>
+      <h1 className="mb-1 font-display text-2xl font-medium text-forest-900">Transactions</h1>
       <p className="mb-6 text-sm text-ink-muted">
         Track each deal from match to completed collection.
       </p>

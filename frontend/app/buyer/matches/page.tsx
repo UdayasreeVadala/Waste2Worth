@@ -141,7 +141,7 @@ function MatchesInner() {
 
   return (
     <Shell>
-      <h1 className="mb-1 text-2xl font-semibold text-forest-900">Matches</h1>
+      <h1 className="mb-1 font-display text-2xl font-medium text-forest-900">Matches</h1>
       <p className="mb-6 text-sm text-ink-muted">
         Waste you&apos;re matched with and the status of each deal.
       </p>
