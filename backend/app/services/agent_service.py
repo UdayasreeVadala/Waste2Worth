@@ -1,4 +1,9 @@
+import os
+import smtplib
+from email.message import EmailMessage
+
 from app.models.event import TransactionEvent
+from app.models.user import User
 from waste2worth_agent import Waste2WorthAgent
 
 STATUS_MAP = {
@@ -11,6 +16,10 @@ STATUS_MAP = {
     "deal_confirmed": "deal_confirmed",
     "offer_rejected": "offer_rejected",
 }
+
+
+def smtp_configured():
+    return bool(os.getenv("SMTP_HOST") and os.getenv("SMTP_USER") and os.getenv("SMTP_PASSWORD"))
 
 
 class BuyerSimulationGateway:
@@ -32,6 +41,58 @@ class BuyerSimulationGateway:
             "total_price": round(self.waste.quantity_kg * self.buyer.price_per_kg, 2),
             "pickup_included": bool(getattr(self.buyer, "pickup_available", True)),
         }
+
+
+class EmailBuyerGateway:
+    """Real outbound email via SMTP. The inbound reply is expected to arrive via
+    a webhook/inbox watcher that writes a `buyer_reply` TransactionEvent; for the
+    demo the reply is simulated from the buyer's stated price.
+    """
+
+    def __init__(self, db, buyer, waste):
+        self.db = db
+        self.buyer = buyer
+        self.waste = waste
+        self.latest_counter_offer = None
+
+    def _recipient(self):
+        owner = self.db.query(User).filter(User.id == self.buyer.owner_id).first()
+        return owner.email if owner else None
+
+    def _send(self, to_address, subject, body):
+        message = EmailMessage()
+        message["Subject"] = subject
+        message["From"] = os.getenv("SMTP_FROM", os.getenv("SMTP_USER"))
+        message["To"] = to_address
+        message.set_content(body)
+
+        with smtplib.SMTP(os.getenv("SMTP_HOST"), int(os.getenv("SMTP_PORT", "587"))) as smtp:
+            smtp.starttls()
+            smtp.login(os.getenv("SMTP_USER"), os.getenv("SMTP_PASSWORD"))
+            smtp.send_message(message)
+
+    def send_waste_offer(self, buyer_id, payload):
+        if "counter_offer" in payload:
+            self.latest_counter_offer = payload["counter_offer"]
+            return self.latest_counter_offer
+
+        outreach = payload.get("outreach_message") or {}
+        to_address = self._recipient()
+        if to_address and smtp_configured():
+            self._send(to_address, outreach.get("subject") or "Available organic feedstock", outreach.get("body") or "")
+        return f"conversation_buyer_{buyer_id}"
+
+    def get_buyer_response(self, conversation_id):
+        return {
+            "total_price": round(self.waste.quantity_kg * self.buyer.price_per_kg, 2),
+            "pickup_included": bool(getattr(self.buyer, "pickup_available", True)),
+        }
+
+
+def build_communication_gateway(db, buyer, waste):
+    if smtp_configured():
+        return EmailBuyerGateway(db, buyer, waste)
+    return BuyerSimulationGateway(buyer, waste)
 
 
 class DatabaseTransactionGateway:
@@ -98,7 +159,7 @@ def run_agent_for_match(db, match, transaction, buyer, waste, rules, supplier_ap
 
     selected_buyer = ai_result["best_buyer"]
     agent = Waste2WorthAgent(
-        communication_gateway=BuyerSimulationGateway(buyer, waste),
+        communication_gateway=build_communication_gateway(db, buyer, waste),
         transaction_gateway=DatabaseTransactionGateway(db, transaction, match),
         event_gateway=DatabaseEventGateway(db, transaction, match),
     )

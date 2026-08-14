@@ -1,4 +1,5 @@
-from waste2worth_agent.negotiation import build_counter_offer, evaluate_offer
+from waste2worth_agent.messaging import generate_outreach_message, suggest_counter_offer
+from waste2worth_agent.negotiation import evaluate_offer
 from waste2worth_ai.validation import parse_supplier_rules
 
 
@@ -17,6 +18,7 @@ class Waste2WorthAgent:
         supplier_approved_contact,
     ):
         events = []
+        transcript = []
         rules = parse_supplier_rules(supplier_rules)
 
         if not supplier_approved_contact:
@@ -29,12 +31,23 @@ class Waste2WorthAgent:
             return {
                 "status": "waiting_for_supplier_approval",
                 "events": ["waiting_for_supplier_approval"],
+                "transcript": transcript,
                 "deal": None,
             }
 
         if not selected_buyer:
             self._record_event(transaction_id, "offer_rejected", "ai_agent", "No selected buyer was provided.")
-            return {"status": "offer_rejected", "events": ["no_selected_buyer"], "deal": None}
+            return {
+                "status": "offer_rejected",
+                "events": ["no_selected_buyer"],
+                "transcript": transcript,
+                "deal": None,
+            }
+
+        outreach = generate_outreach_message(waste_analysis, selected_buyer, {
+            "minimum_total_price": rules.minimum_total_price,
+            "requires_pickup": rules.requires_pickup,
+        })
 
         payload = {
             "waste_type": waste_analysis["display_name"],
@@ -42,28 +55,58 @@ class Waste2WorthAgent:
             "condition": waste_analysis["condition"],
             "supplier_expectation": rules.minimum_total_price,
             "pickup_required": rules.requires_pickup,
+            "outreach_message": outreach,
         }
         conversation_id = self.communication_gateway.send_waste_offer(
             selected_buyer["buyer_id"],
             payload,
         )
         events.append("buyer_contacted")
+        transcript.append({"sender": "ai_agent", "message": outreach["body"], "source": outreach["source"]})
         self._record_event(transaction_id, "buyer_contacted", "ai_agent", "Buyer contacted.", payload)
 
         offer = self.communication_gateway.get_buyer_response(conversation_id)
         events.append("offer_received")
+        transcript.append({"sender": "buyer", "message": offer})
         self._record_event(transaction_id, "offer_received", "buyer", "Buyer response received.", offer)
 
         if evaluate_offer(offer, rules):
             final_offer = offer
             events.append("buyer_offer_accepted")
+            transcript.append(
+                {
+                    "sender": "ai_agent",
+                    "message": "Offer accepted: within supplier limits.",
+                    "source": "rule_negotiation",
+                }
+            )
         elif rules.allow_counter_offer:
-            counter_offer = build_counter_offer(rules)
+            counter_offer = suggest_counter_offer(
+                waste_analysis,
+                selected_buyer,
+                {"minimum_total_price": rules.minimum_total_price, "requires_pickup": rules.requires_pickup},
+                latest_offer=offer,
+            )
             final_offer = self.communication_gateway.send_waste_offer(
                 selected_buyer["buyer_id"],
-                {"counter_offer": counter_offer, "conversation_id": conversation_id},
+                {
+                    "counter_offer": {
+                        "total_price": counter_offer["total_price"],
+                        "pickup_included": counter_offer["pickup_included"],
+                    },
+                    "conversation_id": conversation_id,
+                },
             )
             events.append("counter_offer_sent")
+            transcript.append(
+                {
+                    "sender": "ai_agent",
+                    "message": f"Counter offer: {counter_offer['total_price']} "
+                    f"(pickup {'included' if counter_offer['pickup_included'] else 'not included'}): "
+                    f"{counter_offer['rationale']}",
+                    "source": counter_offer["source"],
+                }
+            )
             self._record_event(
                 transaction_id,
                 "counter_offer_sent",
@@ -78,7 +121,7 @@ class Waste2WorthAgent:
                     {"offer": final_offer},
                 )
                 events.append("counter_offer_rejected")
-                return {"status": "offer_rejected", "events": events, "deal": None}
+                return {"status": "offer_rejected", "events": events, "transcript": transcript, "deal": None}
             events.append("counter_offer_accepted")
         else:
             self.transaction_gateway.update_transaction_status(
@@ -86,7 +129,7 @@ class Waste2WorthAgent:
                 "offer_rejected",
                 {"offer": offer},
             )
-            return {"status": "offer_rejected", "events": events, "deal": None}
+            return {"status": "offer_rejected", "events": events, "transcript": transcript, "deal": None}
 
         deal = {
             "buyer_id": selected_buyer["buyer_id"],
@@ -98,8 +141,9 @@ class Waste2WorthAgent:
         self.transaction_gateway.update_transaction_status(transaction_id, "deal_confirmed", deal)
         self._record_event(transaction_id, "deal_confirmed", "ai_agent", "Deal confirmed.", deal)
         events.append("transaction_updated")
+        transcript.append({"sender": "ai_agent", "message": "Deal confirmed.", "source": "rule_negotiation"})
 
-        return {"status": "deal_confirmed", "events": events, "deal": deal}
+        return {"status": "deal_confirmed", "events": events, "transcript": transcript, "deal": deal}
 
     def _record_event(self, transaction_id, event_type, actor, message, payload=None):
         if self.event_gateway is None:

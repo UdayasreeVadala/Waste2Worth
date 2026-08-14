@@ -1,6 +1,4 @@
-import json
-import os
-
+from waste2worth_ai import llm
 from waste2worth_ai.knowledge_base import WASTE_KNOWLEDGE
 from waste2worth_ai.schemas import WasteInput
 
@@ -45,74 +43,47 @@ def _rule_based_analysis(waste_input: WasteInput):
 
 
 def _try_openai_analysis(waste_input: WasteInput):
-    if not os.getenv("OPENAI_API_KEY"):
-        return None
-
-    try:
-        from openai import OpenAI
-    except ImportError:
-        return None
-
-    client = OpenAI()
     schema = {
-        "type": "json_schema",
-        "name": "waste_analysis",
-        "strict": True,
-        "schema": {
-            "type": "object",
-            "properties": {
-                "waste_type": {"type": "string"},
-                "display_name": {"type": "string"},
-                "category": {"type": "string"},
-                "quantity_kg": {"type": "number"},
-                "condition": {"type": "string"},
-                "location": {"type": "object", "additionalProperties": True},
-                "properties": {"type": "array", "items": {"type": "string"}},
-                "suitable_uses": {"type": "array", "items": {"type": "string"}},
-                "limitations": {"type": "array", "items": {"type": "string"}},
-                "confidence": {"type": "number"},
-                "source": {"type": "string"},
-            },
-            "required": [
-                "waste_type",
-                "display_name",
-                "category",
-                "quantity_kg",
-                "condition",
-                "location",
-                "properties",
-                "suitable_uses",
-                "limitations",
-                "confidence",
-                "source",
-            ],
-            "additionalProperties": False,
+        "properties": {
+            "waste_type": {"type": "string"},
+            "display_name": {"type": "string"},
+            "category": {"type": "string"},
+            "quantity_kg": {"type": "number"},
+            "condition": {"type": "string"},
+            "location": {"type": "object", "additionalProperties": True},
+            "properties": {"type": "array", "items": {"type": "string"}},
+            "suitable_uses": {"type": "array", "items": {"type": "string"}},
+            "limitations": {"type": "array", "items": {"type": "string"}},
+            "confidence": {"type": "number"},
         },
+        "required": [
+            "waste_type",
+            "display_name",
+            "category",
+            "quantity_kg",
+            "condition",
+            "location",
+            "properties",
+            "suitable_uses",
+            "limitations",
+            "confidence",
+        ],
     }
 
-    response = client.responses.create(
-        model=os.getenv("WASTE2WORTH_OPENAI_MODEL", "gpt-5-mini"),
-        input=[
-            {
-                "role": "system",
-                "content": "Analyze organic waste for resource recovery. Return only the requested JSON.",
-            },
-            {
-                "role": "user",
-                "content": json.dumps(
-                    {
-                        "waste_type": waste_input.waste_type,
-                        "quantity_kg": waste_input.quantity_kg,
-                        "condition": waste_input.condition,
-                        "location": waste_input.location,
-                        "notes": waste_input.notes,
-                    }
-                ),
-            },
-        ],
-        text={"format": schema},
+    result = llm.chat_json(
+        system_prompt="Analyze organic waste for resource recovery. Return only the requested JSON.",
+        user_payload={
+            "waste_type": waste_input.waste_type,
+            "quantity_kg": waste_input.quantity_kg,
+            "condition": waste_input.condition,
+            "location": waste_input.location,
+            "notes": waste_input.notes,
+        },
+        name="waste_analysis",
+        schema=schema,
     )
+    if result is None:
+        return None
 
-    result = json.loads(response.output_text)
     result["source"] = "openai_responses_api"
     return result

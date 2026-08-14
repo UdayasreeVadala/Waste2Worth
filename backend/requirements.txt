@@ -7,3 +7,5 @@ passlib
 python-jose[cryptography]
 email-validator
 streamlit
+openai
+pillow

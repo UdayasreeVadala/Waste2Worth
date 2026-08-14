@@ -4,8 +4,8 @@ from pydantic import BaseModel
 
 
 class WasteCreate(BaseModel):
-    produce_type: str
-    quantity_kg: float
+    produce_type: str = ""
+    quantity_kg: float | None = None
     condition: str = "unknown"
     location: str | None = None
     latitude: float | None = None
@@ -14,6 +14,7 @@ class WasteCreate(BaseModel):
     available_from: str | None = None
     available_until: str | None = None
     photo_url: str | None = None
+    description: str | None = None
 
 
 class WasteUpdate(BaseModel):

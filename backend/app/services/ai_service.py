@@ -1,3 +1,4 @@
+from waste2worth_ai import llm
 from waste2worth_ai.errors import ContractError
 from waste2worth_ai.pipeline import evaluate_waste_opportunity
 
@@ -8,6 +9,7 @@ def analyze_waste_listing(waste, buyers):
     return evaluate_waste_opportunity(
         waste_input=_waste_to_ai_input(waste),
         buyers=[_buyer_to_ai_input(buyer) for buyer in buyers],
+        use_openai=llm.ai_enabled() and llm.has_api_key(),
     )
 
 

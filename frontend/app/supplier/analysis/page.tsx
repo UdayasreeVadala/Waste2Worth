@@ -3,23 +3,77 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Bot, Sparkles } from "lucide-react";
+import { Bot, Leaf, TrendingUp } from "lucide-react";
 import { Shell } from "@/components/Shell";
-import { Button, Card, EmptyState, Field, Input, Spinner, StatusPill } from "@/components/ui";
+import { Button, Card, EmptyState, Field, Input, Spinner, StatCard } from "@/components/ui";
 import { http } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { useData } from "@/lib/hooks";
 import { money, num, statusLabel } from "@/lib/format";
+
+type Margin = {
+  currency?: string;
+  buyer_offer?: number;
+  transport_cost?: number;
+  platform_fee?: number;
+  estimated_supplier_earnings?: number;
+};
+
+type BuyerRow = {
+  buyer_id: string;
+  name: string;
+  business_type: string;
+  distance_km?: number;
+  price_per_kg?: number;
+  currency: string;
+  pickup_available?: boolean;
+  current_capacity_kg?: number;
+  estimated_margin?: Margin;
+  score?: number;
+  factor_breakdown?: Record<string, unknown>;
+  explanation?: string;
+};
+
+type BuyerReason = { buyer_id: string; reason: string };
+
+type AnalysisData = {
+  best_buyer?: BuyerRow | null;
+  ranked_buyers?: BuyerRow[];
+  recommended_use?: {
+    recommended_label: string;
+    recommended_route: string;
+    reason: string;
+    route_scores?: Record<string, number>;
+  } | null;
+  analysis?: Record<string, unknown>;
+  impact?: {
+    quantity_kg?: number;
+    methane_avoided_kg?: number;
+    co2e_avoided_kg_gwp100?: number;
+    co2e_avoided_kg_gwp20?: number;
+    landfill_diverted_kg?: number;
+    co_benefit?: { label: string; detail: string; kg_co2e?: number } | null;
+    equivalencies?: {
+      km_driven_equivalent?: number;
+      coal_kwh_equivalent?: number;
+      tree_years_equivalent?: number;
+    };
+  };
+  explanation?: { summary?: string; buyer_reasons?: BuyerReason[] };
+  requires_supplier_approval?: boolean;
+  agent_status?: string;
+  error?: { code: string; message: string } | null;
+};
 
 function AnalysisInner() {
   const params = useSearchParams();
   const router = useRouter();
   const wasteId = params.get("waste");
   const { token } = useAuth();
-  const { data, loading, error } = useData<any>(
+  const { data, loading, error } = useData<AnalysisData | null>(
     () =>
       token && wasteId
-        ? http.get(`/waste/${wasteId}/analysis`)
+        ? http.get<AnalysisData>(`/waste/${wasteId}/analysis`)
         : Promise.resolve(null),
     [token, wasteId]
   );
@@ -68,7 +122,7 @@ function AnalysisInner() {
     if (!best) return;
     setBusy(true);
     try {
-      await http.post<any>("/agent/contact", {
+      await http.post<{ status: string }>("/agent/contact", {
         waste_id: Number(wasteId),
         buyer_id: Number(best.buyer_id),
         minimum_total_price: min || best.estimated_margin?.estimated_supplier_earnings || 0,
@@ -147,10 +201,68 @@ function AnalysisInner() {
         </Card>
       </div>
 
-      {data.ranked_buyers?.length > 0 && (
+      {data.impact && (
+        <div className="mt-6">
+          <h3 className="mb-3 flex items-center gap-2 font-semibold text-ink">
+            <Leaf className="h-4 w-4 text-forest-800" /> Environmental impact of this listing
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+              label="CO₂e avoided (GWP100)"
+              value={`${num(data.impact.co2e_avoided_kg_gwp100)} kg`}
+              hint={`${num(data.impact.co2e_avoided_kg_gwp20)} kg over a 20-year lens`}
+              tone="accent"
+            />
+            <StatCard
+              label="Methane avoided"
+              value={`${num(data.impact.methane_avoided_kg)} kg`}
+              hint="CH₄ is ~28× CO₂ over 100 years"
+            />
+            <StatCard
+              label="Equivalent"
+              value={`${num(data.impact.equivalencies?.km_driven_equivalent)} km`}
+              hint="driving, or tree-years"
+            />
+            <StatCard
+              label="Your earning"
+              value={
+                best?.estimated_margin
+                  ? money(best.estimated_margin.estimated_supplier_earnings, best.currency)
+                  : "—"
+              }
+              hint={`route: ${data.recommended_use?.recommended_route ?? "—"}`}
+            />
+          </div>
+          {data.impact.co_benefit && (
+            <p className="mt-3 text-sm text-ink-muted">
+              <TrendingUp className="mr-1 inline h-4 w-4" />
+              Co-benefit — {data.impact.co_benefit.label}: +{num(data.impact.co_benefit.kg_co2e)} kg CO₂e
+              ({data.impact.co_benefit.detail})
+            </p>
+          )}
+        </div>
+      )}
+
+      {data.explanation?.summary && (
+        <Card title="Why this ranking" className="mt-6">
+          <p className="text-sm text-ink">{data.explanation.summary}</p>
+          <ul className="mt-3 space-y-2">
+            {data.explanation.buyer_reasons?.map((r: BuyerReason) => (
+              <li key={r.buyer_id} className="text-sm text-ink-muted">
+                <span className="font-medium text-forest-900">
+                  {data.ranked_buyers?.find((b: BuyerRow) => b.buyer_id === r.buyer_id)?.name ?? r.buyer_id}
+                </span>
+                : {r.reason}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {(data.ranked_buyers?.length ?? 0) > 0 && (
         <Card title="Ranked buyers" className="mt-6">
           <ul className="divide-y divide-ink/10">
-            {data.ranked_buyers.map((b: any) => (
+            {data.ranked_buyers?.map((b: BuyerRow) => (
               <li key={b.buyer_id} className="flex items-center justify-between py-2 text-sm">
                 <span>
                   {b.name}{" "}

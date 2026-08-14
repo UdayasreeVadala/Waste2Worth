@@ -1,4 +1,5 @@
 from waste2worth_ai.pricing import estimate_margin
+from waste2worth_ai.scoring_config import SCORING
 
 
 def rank_buyers(waste_analysis, buyers):
@@ -27,6 +28,7 @@ def rank_buyers(waste_analysis, buyers):
                 "current_capacity_kg": buyer.current_capacity_kg,
                 "estimated_margin": margin,
                 "score": score,
+                "factor_breakdown": _factor_breakdown(buyer, margin),
                 "explanation": _explain_match(buyer, margin),
             }
         )
@@ -61,12 +63,50 @@ def _is_suitable(waste_analysis, buyer):
 
 
 def _score(buyer, margin):
-    net = margin["estimated_supplier_earnings"]
-    distance_score = max(0, 80 - (buyer.distance_km or 80))
-    pickup_score = 30 if buyer.pickup_available else 0
-    capacity_score = min(buyer.current_capacity_kg / 100, 25)
-    availability_score = 12 if buyer.availability_status == "available" else 4
-    return round((net * 0.75) + (distance_score * 1.1) + pickup_score + capacity_score + availability_score, 2)
+    earnings_points = margin["estimated_supplier_earnings"] * SCORING["earnings_weight"]
+    distance_points = max(0, SCORING["distance_floor_km"] - (buyer.distance_km or SCORING["distance_floor_km"]))
+    pickup_points = SCORING["pickup_bonus"] if buyer.pickup_available else 0
+    capacity_points = min(
+        (buyer.current_capacity_kg or 0) / 100 * SCORING["capacity_bonus_per_100_kg"],
+        SCORING["capacity_bonus_cap"],
+    )
+    availability_points = (
+        SCORING["availability_available"]
+        if buyer.availability_status == "available"
+        else SCORING["availability_limited"]
+    )
+
+    return round(
+        (earnings_points * 1.0)
+        + (distance_points * SCORING["distance_weight"])
+        + pickup_points
+        + capacity_points
+        + availability_points,
+        2,
+    )
+
+
+def _factor_breakdown(buyer, margin):
+    earnings_points = margin["estimated_supplier_earnings"] * SCORING["earnings_weight"]
+    distance_points = max(0, SCORING["distance_floor_km"] - (buyer.distance_km or SCORING["distance_floor_km"]))
+    pickup_points = SCORING["pickup_bonus"] if buyer.pickup_available else 0
+    capacity_points = min(
+        (buyer.current_capacity_kg or 0) / 100 * SCORING["capacity_bonus_per_100_kg"],
+        SCORING["capacity_bonus_cap"],
+    )
+    availability_points = (
+        SCORING["availability_available"]
+        if buyer.availability_status == "available"
+        else SCORING["availability_limited"]
+    )
+    return {
+        "earnings_points": round(earnings_points, 2),
+        "distance_points": round(distance_points * SCORING["distance_weight"], 2),
+        "pickup_points": pickup_points,
+        "capacity_points": round(capacity_points, 2),
+        "availability_points": availability_points,
+        "version": SCORING["version"],
+    }
 
 
 def _explain_match(buyer, margin):

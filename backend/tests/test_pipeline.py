@@ -145,3 +145,39 @@ def test_pipeline_rejects_invalid_quantity():
         assert exc.field == "quantity_kg"
     else:
         raise AssertionError("Expected ContractError")
+
+
+def test_pipeline_reports_impact_and_explanation():
+    result = evaluate_waste_opportunity(
+        waste_input={
+            "waste_type": "tomato",
+            "quantity_kg": 700,
+            "condition": "spoiled",
+            "location": {"city": "Nashik", "country": "India"},
+        },
+        buyers=[
+            {
+                "id": "buyer_1",
+                "name": "GreenBio Energy",
+                "business_type": "Biogas plant",
+                "location": {"city": "Nashik", "country": "India"},
+                "distance_km": 25,
+                "service_radius_km": 50,
+                "accepted_waste": ["tomato", "vegetable"],
+                "min_quantity_kg": 300,
+                "max_quantity_kg": 3000,
+                "current_capacity_kg": 1500,
+                "price_per_kg": 0.3,
+                "currency": "USD",
+                "pickup_available": True,
+                "availability_status": "available",
+            }
+        ],
+    )
+
+    assert result["impact"]["quantity_kg"] == 700
+    assert result["impact"]["co2e_avoided_kg_gwp100"] > 0
+    assert result["impact"]["economic"]["estimated_supplier_earnings"] > 0
+    assert result["explanation"]["summary"]
+    assert result["explanation"]["buyer_reasons"][0]["buyer_id"] == "buyer_1"
+    assert result["best_buyer"]["factor_breakdown"]["version"]
